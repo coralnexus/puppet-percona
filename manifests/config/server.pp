@@ -1,5 +1,14 @@
-class percona::config::server {
-  if $percona::server {
+
+class percona::config::server (
+
+  $server = $percona::params::server,
+  $port   = $percona::params::port,
+
+) inherits percona::params {
+
+  #-----------------------------------------------------------------------------
+
+  if $server {
     File {
       owner   => $percona::params::user,
       group   => $percona::params::group,
@@ -16,7 +25,7 @@ class percona::config::server {
     file {
       $percona::params::config:
         ensure  => present,
-        content => template ("percona/my.cnf.${::operatingsystem}.erb");
+        content => template("percona/my.cnf.erb");
 
       $percona::params::datadir:
         ensure => directory,

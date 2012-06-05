@@ -1,32 +1,43 @@
 # Class: percona::install
 #
 #
-class percona::install {
+class percona::install (
+
+  $client          = $percona::client,
+  $server          = $percona::server,
+  $percona_version = $percona::params::percona_version,
+  $pkg_common      = $percona::params::pkg_common,
+  $pkg_client      = $percona::params::pkg_client,
+  $pkg_server      = $percona::params::pkg_server,
+
+) inherits percona::params {
+
+  #-----------------------------------------------------------------------------
+
   Package {
     require => [
-      Class['percona::params'],
       Class['percona::preinstall'],
     ],
   }
 
   package {
-    $percona::params::pkg_common:
-      ensure => present;
+    $pkg_common:
+      ensure => 'present';
   }
 
-  if $percona::client {
+  if $client {
     package {
-      $percona::params::pkg_client:
-        ensure  => present,
-        require => Package[$percona::params::pkg_common];
+      $pkg_client:
+        ensure  => 'present',
+        require => Package[$pkg_common];
     }
   }
 
-  if $percona::server {
+  if $server {
     package {
-      $percona::params::pkg_server:
-        ensure  => present,
-        require => Package[$percona::params::pkg_client];
+      $pkg_server:
+        ensure  => 'present',
+        require => Package[$pkg_client];
     }
   }
 }

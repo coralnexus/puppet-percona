@@ -1,3 +1,4 @@
+
 define percona::user (
   $password,
   $database,

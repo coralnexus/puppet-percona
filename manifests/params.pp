@@ -1,7 +1,13 @@
-# Class percona::params
-#
-#
+
 class percona::params {
+
+  $client          = true
+
+  $server          = false
+  $port            = 3306
+
+  $percona_version = '5.5' # Options: 5.1, 5.5
+
   $service   = 'mysql'
   $user      = 'mysql'
   $group     = 'mysql'
@@ -14,33 +20,13 @@ class percona::params {
 
   case $::operatingsystem {
     'debian', 'ubuntu': {
-      $pkg_version = $percona::percona_version
-
       $confdir    = '/etc/mysql'
       $config     = '/etc/mysql/my.cnf'
-      $pkg_client = "percona-server-client-${pkg_version}"
-      $pkg_server = "percona-server-server-${pkg_version}"
+      $pkg_client = "percona-server-client-${percona_version}"
+      $pkg_server = "percona-server-server-${percona_version}"
       $pkg_common = [
         'percona-toolkit',
-        "percona-server-common-${pkg_version}"
-      ]
-    }
-
-    'RedHat', 'CentOS': {
-      case $percona::percona_version {
-        '5.1':   { $pkg_version = '51' }
-        '5.5':   { $pkg_version = '55' }
-        default: { $pkg_version = '55' }
-      }
-
-      $config     = '/etc/my.cnf'
-      $pkg_client = "Percona-Server-client-${pkg_version}"
-      $pkg_server = "Percona-Server-server-${pkg_version}"
-      $pkg_common = [
-        'percona-toolkit',
-        'Percona-Server-shared-compat',
-        "Percona-Server-devel-${pkg_version}",
-        "Percona-Server-shared-${pkg_version}",
+        "percona-server-common-${percona_version}",
       ]
     }
 

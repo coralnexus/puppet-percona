@@ -1,12 +1,26 @@
-# Class: percona::preinstall
-#
-#
-class percona::preinstall {
-  if $percona::client {
+
+class percona::preinstall (
+
+  $client = $percona::params::client,
+  $server = $percona::params::server,
+
+) inherits percona::params {
+
+  include apt
+
+  #-----------------------------------------------------------------------------
+
+  if $client {
+
   }
 
-  if $percona::server {
+  #-----------------------------------------------------------------------------
+
+  if $server {
+
   }
+
+  #-----------------------------------------------------------------------------
 
   case $::operatingsystem {
     'debian', 'Debian', 'ubuntu', 'Ubuntu': {
@@ -23,16 +37,9 @@ class percona::preinstall {
       }
 
       exec { 'apt-get update':
+        path        => [ '/bin', '/usr/bin' ],
         command     => 'apt-get update',
         refreshonly => true;
-      }
-    }
-
-    'RedHat', 'redhat', 'CentOS', 'centos': {
-      package { 'percona-release':
-        ensure   => present,
-        provider => 'rpm',
-        source   => "http://www.percona.com/redir/downloads/percona-release/percona-release-0.0-1.${::hardwaremodel}.rpm";
       }
     }
 

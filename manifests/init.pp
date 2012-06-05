@@ -4,6 +4,13 @@
 #
 # Parameters:
 #
+#  $client          = $percona::params::client,
+#  $server          = $percona::params::server,
+#  $percona_version = $percona::params::percona_version,
+#  $pkg_common      = $percona::params::pkg_common,
+#  $pkg_client      = $percona::params::pkg_client,
+#  $pkg_server      = $percona::params::pkg_common,
+#
 # Actions:
 #   - Install PerconaDB
 #   - Install PerconaXtraDB
@@ -21,7 +28,7 @@
 #    }
 #
 #  node client {
-#    include percona': }
+#    include percona'
 #  }
 #
 # Valid options:
@@ -29,20 +36,45 @@
 # Known issues:
 #
 class percona (
-  $client          = true,
-  $server          = undef,
-  $percona_version = '5.5' # Options: 5.1, 5.5
-) {
-  include motd
-  motd::register {'percona': }
 
-  include percona::params
-  include percona::preinstall
-  include percona::install
-  include percona::config
-  include percona::service
+  $client          = $percona::params::client,
+  $server          = $percona::params::server,
+  $port            = $percona::params::port,
+  $percona_version = $percona::params::percona_version,
+  $pkg_common      = $percona::params::pkg_common,
+  $pkg_client      = $percona::params::pkg_client,
+  $pkg_server      = $percona::params::pkg_server,
 
-  Class['percona::params'] ->
+) inherits percona::params {
+
+  #-----------------------------------------------------------------------------
+
+  class { 'percona::firewall': port => $port }
+
+  class { 'percona::preinstall':
+    client => $client,
+    server => $server,
+  }
+
+  class { 'percona::install':
+    client          => $client,
+    server          => $server,
+    percona_version => $percona_version,
+    pkg_common      => $pkg_common,
+    pkg_client      => $pkg_client,
+    pkg_server      => $pkg_server,
+  }
+
+  class { 'percona::config':
+
+  }
+
+  class { 'percona::service':
+
+  }
+
+  #-----------------------------------------------------------------------------
+
   Class['percona::preinstall'] ->
   Class['percona::install'] ->
   Class['percona::config'] ->
