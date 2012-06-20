@@ -6,6 +6,7 @@
 #
 #  $client          = $percona::params::client,
 #  $server          = $percona::params::server,
+#  $port            = $percona::params::port,
 #  $percona_version = $percona::params::percona_version,
 #  $pkg_common      = $percona::params::pkg_common,
 #  $pkg_client      = $percona::params::pkg_client,
@@ -40,6 +41,7 @@ class percona (
   $client          = $percona::params::client,
   $server          = $percona::params::server,
   $port            = $percona::params::port,
+  $allow_remote    = $percona::params::allow_remote,
   $percona_version = $percona::params::percona_version,
   $pkg_common      = $percona::params::pkg_common,
   $pkg_client      = $percona::params::pkg_client,
@@ -49,7 +51,11 @@ class percona (
 
   #-----------------------------------------------------------------------------
 
-  class { 'percona::firewall': port => $port }
+  if $port {
+    class { 'percona::firewall':
+      port => $port,
+    }
+  }
 
   class { 'percona::preinstall':
     client => $client,
@@ -66,11 +72,13 @@ class percona (
   }
 
   class { 'percona::config':
-
+    client => $client,
+    server => $server,
+    port   => $port,
   }
 
   class { 'percona::service':
-
+    server => $server,
   }
 
   #-----------------------------------------------------------------------------

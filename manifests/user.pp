@@ -1,28 +1,43 @@
 
 define percona::user (
-  $password,
-  $database,
-  $ensure = present,
-  $host   = 'localhost'
+
+  $user_name = $name,
+  $password  = '',
+  $database  = '*',
+  $ensure    = 'present',
+  $host      = 'localhost',
+  $grant     = true,
+
 ) {
+
+  Exec {
+    path    => [ '/bin', '/usr/bin' ],
+    require => Class['percona::service'],
+  }
+
   case $ensure {
     'present': {
-      exec { "MySQL: create user ${name}":
-        command => "mysql --defaults-file=/etc/mysql/debian.cnf --execute=\"GRANT ALL PRIVILEGES ON ${database}.* TO '${name}'@'${host}' IDENTIFIED BY '${password}' WITH GRANT OPTION;\";",
-        require => Class['percona::service'],
-        unless  => "mysql --user=${name} --password=${password} --database=${database} --host=${host}",
+
+      $grant_option = $grant ? {
+        true    => 'WITH GRANT OPTION',
+        default => '',
+      }
+
+      $message = "MySQL: Grant ${user_name}@${host}:${database} $grant_option"
+
+      if ! defined(Exec[$message]) {
+        exec { $message:
+          command => "mysql --defaults-file=/etc/mysql/debian.cnf --execute=\"GRANT ALL ON ${database}.* TO '${user_name}'@'${host}' IDENTIFIED BY '${password}' ${grant_option}\";",
+          unless  => "mysql --user=${user_name} --password=${password} --database=${database} --host=${host}",
+        }
       }
     }
 
     'absent': {
-      exec { "MySQL: create user ${name}":
-        command => "mysql --defaults-file=/etc/mysql/debian.cnf --execute=\"DROP USER ${name};\";",
-        require => Class['percona::service'],
-        onlyif  => "mysql --user=${name} --password=${password}",
+      exec { "MySQL: create user ${user_name}":
+        command => "mysql --defaults-file=/etc/mysql/debian.cnf --execute=\"DROP USER ${user_name}\";",
+        onlyif  => "mysql --user=${user_name} --password=${password}",
       }
-    }
-
-    default: {
     }
   }
 }

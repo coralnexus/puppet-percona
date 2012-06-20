@@ -5,6 +5,7 @@ class percona::params {
 
   $server          = false
   $port            = 3306
+  $allow_remote    = true
 
   $percona_version = '5.5' # Options: 5.1, 5.5
 
