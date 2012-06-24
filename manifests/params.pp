@@ -23,11 +23,11 @@ class percona::params {
     'debian', 'ubuntu': {
       $confdir    = '/etc/mysql'
       $config     = '/etc/mysql/my.cnf'
-      $pkg_client = "percona-server-client-${percona_version}"
-      $pkg_server = "percona-server-server-${percona_version}"
+      $pkg_client = "percona-xtradb-cluster-client-${percona_version}"
+      $pkg_server = "percona-xtradb-cluster-server-${percona_version}"
       $pkg_common = [
         'percona-toolkit',
-        "percona-server-common-${percona_version}",
+        "percona-xtradb-cluster-common-${percona_version}",
       ]
     }
 
