@@ -1,24 +1,7 @@
 
-class percona::preinstall (
-
-  $client = $percona::params::client,
-  $server = $percona::params::server,
-
-) inherits percona::params {
+class percona::preinstall inherits percona::params {
 
   include apt
-
-  #-----------------------------------------------------------------------------
-
-  if $client {
-
-  }
-
-  #-----------------------------------------------------------------------------
-
-  if $server {
-
-  }
 
   #-----------------------------------------------------------------------------
 
