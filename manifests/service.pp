@@ -1,11 +1,7 @@
 # Class: percona::service
 #
 #
-class percona::service (
-
-  $server = $percona::params::server,
-
-) inherits percona::params {
+class percona::service {
 
   #-----------------------------------------------------------------------------
 
@@ -14,11 +10,8 @@ class percona::service (
     enable  => true,
   }
 
-  if $server {
-    service {
-      $percona::params::service:
-        ensure => running,
-        enable => true,
-    }
+  service { $percona::params::service:
+    ensure => running,
+    enable => true,
   }
 }
