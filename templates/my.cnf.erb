@@ -1,78 +1,96 @@
-[client]
-port		= <%= port %>
-socket	= /var/run/mysqld/mysqld.sock
+# MySQL config file for large systems.
+#
+# This is for a large system with memory = 512M where the system runs mainly
+# MySQL.
+#
+# MySQL programs look for option files in a set of
+# locations which depend on the deployment platform.
+# You can copy this option file to one of those
+# locations. For information about these locations, see:
+# http://dev.mysql.com/doc/mysql/en/option-files.html
+#
+# In this file, you can use all long options that a program supports.
+# If you want to know which options a program supports, run the program
+# with the "--help" option.
 
-[mysqld_safe]
-socket	= /var/run/mysqld/mysqld.sock
-nice		= 0
+[client]
+port   = <%= port %>
+socket = /var/run/mysqld/mysqld.sock
 
 [mysqld]
-user		  = mysql
-pid-file	= /var/run/mysqld/mysqld.pid
-socket		= /var/lib/mysql/mysql.sock
-port		  = <%= port %>
-basedir		= /usr
-datadir		= /var/lib/mysql
-tmpdir		= /tmp
-language	= /usr/share/mysql/english
+port   = <%= port %>
+socket = /var/run/mysqld/mysqld.sock
 skip-external-locking
 
-#bind-address	= 127.0.0.1
+key_buffer_size         = 256M
+max_allowed_packet      = 1M
+table_open_cache        = 256
+sort_buffer_size        = 1M
+read_buffer_size        = 1M
+read_rnd_buffer_size    = 4M
+myisam_sort_buffer_size = 64M
+thread_cache_size       = 8
+query_cache_size        = 16M
+thread_concurrency      = 8
 
-#
-# * Fine Tuning
-#
-key_buffer	       = 100M
-max_allowed_packet = 50M
-thread_stack		   = 192K
-thread_cache_size  = 8
+#skip-networking
 
-myisam-recover         = BACKUP
-#max_connections        = 100
-#table_cache            = 64
-#thread_concurrency     = 10
+datadir = /var/lib/sql
 
-#
-# * Query Cache Configuration
-#
-query_cache_limit	= 10M
-query_cache_size  = 256M
+log-bin                        = mysql-bin
+binlog_format                  = ROW
 
-#
-# * Logging and Replication
-#
-#general_log_file = /var/log/mysql/mysql.log
-#general_log      = 1
+server-id                      = <%= server_id %>
+wsrep_node_name                = ip-<%= server_ip %>
+wsrep_cluster_address          = gcomm://<%= origin_ip %>
+wsrep_cluster_name             = <%= origin_ip %>
 
-log_slow_queries	= /var/log/mysql/mysql-slow.log
-long_query_time  = 2
-log-queries-not-using-indexes
+wsrep_provider                 = /usr/lib/libgalera_smm.so
+wsrep_sst_method               = xtrabackup
+wsrep_slave_threads            = 2
+wsrep_certify_nonPK            = 1
+wsrep_max_ws_rows              = 131072
+wsrep_max_ws_size              = 1073741824
+wsrep_debug                    = 0
+wsrep_convert_LOCK_to_trx      = 0
+wsrep_retry_autocommit         = 1
+wsrep_auto_increment_control   = 1
+wsrep_drupal_282555_workaround = 0
+wsrep_causal_reads             = 0
+wsrep_notify_cmd               =
 
-#server-id	    	= 1
-#log_bin			    = /var/log/mysql/mysql-bin.log
-expire_logs_days	= 10
-max_binlog_size   = 100M
-#binlog_do_db		  = include_database_name
-#binlog_ignore_db	= include_database_name
+log_slave_updates
 
-#
-# * InnoDB
-#
+default-storage-engine = innodb
 
-#
-# * Security Features
-#
+innodb_data_home_dir            = /var/lib/mysql
+innodb_data_file_path           = ibdata1:10M:autoextend
+innodb_log_group_home_dir       = /var/lib/mysql
+innodb_buffer_pool_size         = 256M
+innodb_additional_mem_pool_size = 20M
+innodb_log_file_size            = 64M
+innodb_log_buffer_size          = 8M
+innodb_flush_log_at_trx_commit  = 1
+innodb_lock_wait_timeout        = 50
+innodb_autoinc_lock_mode        = 2
+innodb_locks_unsafe_for_binlog  = 1
 
 [mysqldump]
 quick
-quote-names
-max_allowed_packet	= 50M
+max_allowed_packet = 16M
 
 [mysql]
-#no-auto-rehash	# faster start of mysql but no tab completition
+no-auto-rehash
+#safe-updates
 
-[isamchk]
-key_buffer		= 100M
+[myisamchk]
+key_buffer_size  = 128M
+sort_buffer_size = 128M
+read_buffer      = 2M
+write_buffer     = 2M
+
+[mysqlhotcopy]
+interactive-timeout
 
 #
 # * IMPORTANT: Additional settings that can override those from this file!
