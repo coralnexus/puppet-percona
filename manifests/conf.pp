@@ -1,7 +1,10 @@
 define percona::conf (
+
   $content,
   $ensure = present
+
 ) {
+
   file { "${percona::params::confdir}/conf.d/${name}.cnf":
     ensure  => $ensure,
     owner   => $percona::params::user,
