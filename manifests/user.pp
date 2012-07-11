@@ -1,12 +1,14 @@
 
 define percona::user (
 
-  $user_name = $name,
-  $password  = '',
-  $database  = '*',
-  $ensure    = 'present',
-  $host      = 'localhost',
-  $grant     = true,
+  $user_name   = $name,
+  $password    = '',
+  $database    = '*',
+  $ensure      = 'present',
+  $host        = 'localhost',
+  $port        = 3306,
+  $permissions = 'ALL',
+  $grant       = true,
 
 ) {
 
@@ -27,16 +29,16 @@ define percona::user (
 
       if ! defined(Exec[$message]) {
         exec { $message:
-          command => "mysql --defaults-file=/etc/mysql/debian.cnf --execute=\"GRANT ALL ON ${database}.* TO '${user_name}'@'${host}' IDENTIFIED BY '${password}' ${grant_option}\";",
-          unless  => "mysql --user=${user_name} --password=${password} --database=${database} --host=${host}",
+          command => "mysql --defaults-file=/etc/mysql/debian.cnf --host=${host} --port=${port} --execute=\"GRANT ${permissions} ON ${database}.* TO '${user_name}'@'${host}' IDENTIFIED BY '${password}' ${grant_option}\";",
+          unless  => "mysql --user=${user_name} --password=${password} --database=${database} --host=${host} --port=${port}",
         }
       }
     }
 
     'absent': {
       exec { "MySQL: create user ${user_name}":
-        command => "mysql --defaults-file=/etc/mysql/debian.cnf --execute=\"DROP USER ${user_name}\";",
-        onlyif  => "mysql --user=${user_name} --password=${password}",
+        command => "mysql --defaults-file=/etc/mysql/debian.cnf --host=${host} --port=${port} --execute=\"DROP USER ${user_name}\";",
+        onlyif  => "mysql --user=${user_name} --password=${password} --host=${host} --port=${port}",
       }
     }
   }
