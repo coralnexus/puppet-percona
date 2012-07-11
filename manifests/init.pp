@@ -4,17 +4,20 @@
 #
 # Parameters:
 #
-#  $client          = $percona::params::client,
-#  $server          = $percona::params::server,
-#  $port            = $percona::params::port,
-#  $percona_version = $percona::params::percona_version,
-#  $pkg_common      = $percona::params::pkg_common,
-#  $pkg_client      = $percona::params::pkg_client,
-#  $pkg_server      = $percona::params::pkg_common,
+#    $server            = false,
+#    $server_id         = $percona::params::server_id,
+#    $server_ip         = $percona::params::server_ip,
+#    $origin_ip         = $percona::params::origin_ip,
+#    $port              = $percona::params::port,
+#    $mysqlchk_port     = $percona::params::mysqlchk_port,
+#    $allow_remote      = $percona::params::allow_remote,
+#    $percona_version   = $percona::params::percona_version,
+#    $pkg_common_ensure = $percona::params::pkg_common_ensure,
+#    $pkg_client_ensure = $percona::params::pkg_client_ensure,
+#    $pkg_server_ensure = $percona::params::pkg_server_ensure,
 #
 # Actions:
-#   - Install PerconaDB
-#   - Install PerconaXtraDB
+#   - Install Percona XtraDB Cluster
 #
 # Requires:
 #   - camp2camp puppet-apt module:
@@ -38,14 +41,17 @@
 #
 class percona (
 
-  $client          = $percona::params::client,
-  $server          = $percona::params::server,
-  $port            = $percona::params::port,
-  $allow_remote    = $percona::params::allow_remote,
-  $percona_version = $percona::params::percona_version,
-  $pkg_common      = $percona::params::pkg_common,
-  $pkg_client      = $percona::params::pkg_client,
-  $pkg_server      = $percona::params::pkg_server,
+  $server            = false,
+  $server_id         = $percona::params::server_id,
+  $server_ip         = $percona::params::server_ip,
+  $origin_ip         = $percona::params::origin_ip,
+  $port              = $percona::params::port,
+  $mysqlchk_port     = $percona::params::mysqlchk_port,
+  $allow_remote      = $percona::params::allow_remote,
+  $percona_version   = $percona::params::percona_version,
+  $pkg_common_ensure = $percona::params::pkg_common_ensure,
+  $pkg_client_ensure = $percona::params::pkg_client_ensure,
+  $pkg_server_ensure = $percona::params::pkg_server_ensure,
 
 ) inherits percona::params {
 
@@ -53,38 +59,53 @@ class percona (
 
   if $port {
     class { 'percona::firewall':
-      port => $port,
+      port          => $port,
+      mysqlchk_port => $mysqlchk_port,
     }
   }
 
-  class { 'percona::preinstall':
-    client => $client,
-    server => $server,
-  }
+  include percona::preinstall
 
   class { 'percona::install':
-    client          => $client,
-    server          => $server,
-    percona_version => $percona_version,
-    pkg_common      => $pkg_common,
-    pkg_client      => $pkg_client,
-    pkg_server      => $pkg_server,
+    server            => $server,
+    percona_version   => $percona_version,
+    pkg_common_ensure => $pkg_common_ensure,
+    pkg_client_ensure => $pkg_client_ensure,
+    pkg_server_ensure => $pkg_server_ensure,
   }
 
-  class { 'percona::config':
-    client => $client,
-    server => $server,
-    port   => $port,
-  }
+  if $server {
+    class { 'percona::config':
+      server_id     => $server_id,
+      server_ip     => $server_ip,
+      origin_ip     => $origin_ip,
+      port          => $port,
+      mysqlchk_port => $mysqlchk_port,
+    }
 
-  class { 'percona::service':
-    server => $server,
+    include percona::service
+
+    #---
+
+    percona::user { $percona::params::cluster_check_user:
+      password    => $percona::params::cluster_check_pw,
+      ensure      => 'present',
+      host        => 'localhost',
+      port        => $port,
+      database    => '*',
+      permissions => 'PROCESS',
+      grant       => false,
+    }
+
+    #---
+
+    Class['percona::install']
+    -> Class['percona::config']
+    -> Percona::User[$percona::params::cluster_check_user]
+    -> Class['percona::service']
   }
 
   #-----------------------------------------------------------------------------
 
-  Class['percona::preinstall'] ->
-  Class['percona::install'] ->
-  Class['percona::config'] ->
-  Class['percona::service']
+  Class['percona::preinstall'] -> Class['percona::install']
 }
