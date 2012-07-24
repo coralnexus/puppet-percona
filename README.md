@@ -1,4 +1,11 @@
-# Puppet Percona
+# Puppet Percona XtraDB Cluster (with Xtrabackup)
+
+This module was originally forked from https://github.com/arioch/puppet-percona.
+
+While some things remain the same, the majority of this module has been 
+significantly refactored to include Hiera support.  We utilize smart defaults
+and the hiera function to allow for fine grained configurability without extra
+Puppet code.
 
 ## Requirements
 
@@ -23,9 +30,7 @@
 ### Configuration
     percona::conf {
       'innodb_file_per_table': content => "[mysqld]\ninnodb_file_per_table";
-      'query_cache_size':      content => "[mysqld]\nquery_cache_size = 32M";
-      'table_open_cache':      content => "[mysqld]\ntable_open_cache = 768";
-
+      
       'foo':
         ensure  => present,
         content => template ("percona/custom1.cnf.erb");
