@@ -1,7 +1,7 @@
-# MySQL config file for large systems.
+# Puppet managed MySQL config file.
 #
-# This is for a large system with memory = 512M where the system runs mainly
-# MySQL.
+# The percona module defaults are for a large system with memory = 512M where 
+# the system runs mainly MySQL.
 #
 # MySQL programs look for option files in a set of
 # locations which depend on the deployment platform.
@@ -15,85 +15,85 @@
 
 [client]
 port   = <%= port %>
-socket = /var/run/mysqld/mysqld.sock
+socket = <%= socket %>
 
 [mysqld]
 port   = <%= port %>
-socket = /var/run/mysqld/mysqld.sock
-skip-external-locking
+socket = <%= socket %>
+<%= skip_external_locking == 'true' ? 'skip-external-locking' : '' %>
 
-key_buffer_size         = 256M
-max_allowed_packet      = 1M
-table_open_cache        = 256
-sort_buffer_size        = 1M
-read_buffer_size        = 1M
-read_rnd_buffer_size    = 4M
-myisam_sort_buffer_size = 64M
-thread_cache_size       = 8
-query_cache_size        = 16M
-thread_concurrency      = 8
+key_buffer_size         = <%= key_buffer_size %>
+max_allowed_packet      = <%= max_allowed_packet %>
+table_open_cache        = <%= table_open_cache %>
+sort_buffer_size        = <%= sort_buffer_size %>
+read_buffer_size        = <%= read_buffer_size %>
+read_rnd_buffer_size    = <%= read_rnd_buffer_size %>
+myisam_sort_buffer_size = <%= myisam_sort_buffer_size %>
+thread_cache_size       = <%= thread_cache_size %>
+query_cache_size        = <%= query_cache_size %>
+thread_concurrency      = <%= thread_concurrency %>
 
-#skip-networking
+<%= skip_networking == 'true' ? 'skip-networking' : '' %>
 
-datadir = /var/lib/sql
+datadir = <%= data_dir %>
 
-log-bin                        = mysql-bin
-binlog_format                  = ROW
+log-bin                        = <%= log_bin %>
+binlog_format                  = <%= binlog_format %>
 
 server-id                      = <%= server_id %>
 wsrep_node_name                = ip-<%= server_ip %>
 wsrep_cluster_address          = gcomm://<%= origin_ip %>
 wsrep_cluster_name             = <%= origin_ip %>
 
-wsrep_provider                 = /usr/lib/libgalera_smm.so
-wsrep_sst_method               = xtrabackup
-wsrep_slave_threads            = 2
-wsrep_certify_nonPK            = 1
-wsrep_max_ws_rows              = 131072
-wsrep_max_ws_size              = 1073741824
-wsrep_debug                    = 0
-wsrep_convert_LOCK_to_trx      = 0
-wsrep_retry_autocommit         = 1
-wsrep_auto_increment_control   = 1
+wsrep_provider                 = <%= wsrep_provider %>
+wsrep_sst_method               = <%= wsrep_sst_method %>
+wsrep_slave_threads            = <%= wsrep_slave_threads %>
+wsrep_certify_nonPK            = <%= wsrep_certify_non_pk %>
+wsrep_max_ws_rows              = <%= wsrep_max_ws_rows %>
+wsrep_max_ws_size              = <%= wsrep_max_ws_size %>
+wsrep_debug                    = <%= wsrep_debug %>
+wsrep_convert_LOCK_to_trx      = <%= bwsrep_convert_lock_to_trx %>
+wsrep_retry_autocommit         = <%= wsrep_retry_autocommit %>
+wsrep_auto_increment_control   = <%= wsrep_auto_increment_control %>
 wsrep_drupal_282555_workaround = 0
-wsrep_causal_reads             = 0
-wsrep_notify_cmd               =
+wsrep_causal_reads             = <%= wsrep_causal_reads %>
+wsrep_notify_cmd               = <%= wsrep_notify_cmd %>
 
-log_slave_updates
+<%= log_slave_updates == 'true' ? 'log_slave_updates' : '' %>
 
-default-storage-engine = innodb
+default-storage-engine = <%= default_storage_engine %>
 
-innodb_data_home_dir            = /var/lib/mysql
-innodb_data_file_path           = ibdata1:10M:autoextend
-innodb_log_group_home_dir       = /var/lib/mysql
-innodb_buffer_pool_size         = 256M
-innodb_additional_mem_pool_size = 20M
-innodb_log_file_size            = 64M
-innodb_log_buffer_size          = 8M
-innodb_flush_log_at_trx_commit  = 1
-innodb_lock_wait_timeout        = 50
-innodb_autoinc_lock_mode        = 2
-innodb_locks_unsafe_for_binlog  = 1
-
-[mysqldump]
-quick
-max_allowed_packet = 16M
+innodb_data_home_dir            = <%= innodb_data_home_dir %>
+innodb_data_file_path           = <%= innodb_data_file_path %>
+innodb_log_group_home_dir       = <%= innodb_log_group_home_dir %>
+innodb_buffer_pool_size         = <%= innodb_buffer_pool_size %>
+innodb_additional_mem_pool_size = <%= innodb_additional_mem_pool_size %>
+innodb_log_file_size            = <%= innodb_log_file_size %>
+innodb_log_buffer_size          = <%= innodb_log_buffer_size %>
+innodb_flush_log_at_trx_commit  = <%= innodb_flush_log_at_trx_commit %>
+innodb_lock_wait_timeout        = <%= innodb_lock_wait_timeout %>
+innodb_autoinc_lock_mode        = <%= innodb_autoinc_lock_mode %>
+innodb_locks_unsafe_for_binlog  = <%= innodb_locks_unsafe_for_binlog %>
 
 [mysql]
-no-auto-rehash
-#safe-updates
+<%= mysql_no_auto_rehash == 'true' ? 'no-auto-rehash' : '' %>
+<%= mysql_safe_updates == 'true' ? 'safe-updates' : '' %>
+
+[mysqldump]
+<%= mysqldump_quick == 'true' ? 'quick' : '' %>
+max_allowed_packet = <%= mysqldump_max_allowed_packet %>
 
 [myisamchk]
-key_buffer_size  = 128M
-sort_buffer_size = 128M
-read_buffer      = 2M
-write_buffer     = 2M
+key_buffer_size  = <%= myisamchk_key_buffer_size %>
+sort_buffer_size = <%= myisamchk_sort_buffer_size %>
+read_buffer      = <%= myisamchk_read_buffer %>
+write_buffer     = <%= myisamchk_write_buffer %>
 
 [mysqlhotcopy]
-interactive-timeout
+<%= mysqlhotcopy_interactive_timeout == 'true' ? 'interactive-timeout' : '' %>
 
 #
 # * IMPORTANT: Additional settings that can override those from this file!
 #   The files must end with '.cnf', otherwise they'll be ignored.
 #
-!includedir /etc/mysql/conf.d/
+!includedir <%= conf_dir %>

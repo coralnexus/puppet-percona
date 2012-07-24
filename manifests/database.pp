@@ -1,40 +1,45 @@
 
 define percona::database (
 
-  $ensure,
-  $dump = undef
+  $database      = $name,
+  $ensure        = 'present',
+  $port          = $percona::params::port,
+  $sql_dump_file = $percona::params::database_sql_dump_file,
+  $defaults_file = $percona::params::os_defaults_file,
 
 ) {
 
+  include percona
+
+  #-----------------------------------------------------------------------------
+
   Exec {
     path    => [ '/bin', '/usr/bin' ],
-    require => Class['percona::service'],
+    require => Service['mysql'],
   }
 
   case $ensure {
     present: {
-      exec { "MySQL create $name db":
-        command => "mysql --defaults-file=/etc/mysql/debian.cnf --execute=\"CREATE DATABASE ${name}\";",
-        unless  => "mysql --defaults-file=/etc/mysql/debian.cnf --execute=\"SHOW DATABASES;\" | grep -x '${name}'",
+      exec { "MySQL create $database db":
+        command => "mysql --defaults-file=${defaults_file} --port=${port} --execute=\"CREATE DATABASE ${database}\";",
+        unless  => "mysql --defaults-file=${defaults_file} --port=${port} --execute=\"SHOW DATABASES;\" | grep -x '${database}'",
       }
     }
 
     importdb: {
-      exec { "MySQL import $name db":
-        command => "mysql --defaults-file=/etc/mysql/debian.cnf --execute=\"CREATE DATABASE ${name}\";
-              mysql --defaults-file=/etc/mysql/debian.cnf ${name} < ${dump}",
+      if $sql_dump_file {
+        exec { "MySQL import $database db":
+          command => "mysql --defaults-file=${defaults_file} --port=${port} --execute=\"CREATE DATABASE ${database}\";
+                mysql --defaults-file=${defaults_file} ${database} --port=${port} < ${sql_dump_file}",
+        }
       }
     }
 
     absent: {
-      exec { "MySQL drop $name db":
-        command => "mysql --defaults-file=/etc/mysql/debian.cnf --execute=\"DROP DATABASE ${name}\";",
-        onlyif  => "mysql --defaults-file=/etc/mysql/debian.cnf --execute=\"SHOW DATABASES;\" | grep -x '${name}'",
+      exec { "MySQL drop $database db":
+        command => "mysql --defaults-file=${defaults_file} --port=${port} --execute=\"DROP DATABASE ${database}\";",
+        onlyif  => "mysql --defaults-file=${defaults_file} --port=${port} --execute=\"SHOW DATABASES;\" | grep -x '${database}'",
       }
-    }
-
-    default: {
-      fail "Invalid 'ensure' value '$ensure' for mysql::database"
     }
   }
 }
