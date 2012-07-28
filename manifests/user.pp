@@ -24,7 +24,6 @@ define percona::user (
 
   case $ensure {
     'present': {
-
       $grant_option = $grant ? {
         'true'  => 'WITH GRANT OPTION',
         default => '',
