@@ -4,10 +4,11 @@ class percona::default {
   $percona_client_ensure            = 'present'
   $percona_server_ensure            = 'present'
   $percona_common_ensure            = 'present'
-  $percona_service_ensure           = 'present'
+  $percona_service_ensure           = 'running'
   $server_id                        = 1
   $server_ip                        = $::ipaddress
-  $origin_ip                        = ''
+  $origin_ip                        = $::ipaddress
+  $cluster_name                     = 'default'
   $allow_remote                     = 'true'
   $configure_firewall               = 'true'
   $port                             = 3306
@@ -40,7 +41,6 @@ class percona::default {
   $default_storage_engine           = 'innodb'
   $innodb_buffer_pool_size          = '256M'
   $innodb_additional_mem_pool_size  = '20M'
-  $innodb_log_file_size             = '64M'
   $innodb_log_buffer_size           = '8M'
   $innodb_flush_log_at_trx_commit   = '1'
   $innodb_lock_wait_timeout         = '50'
@@ -55,7 +55,8 @@ class percona::default {
   $myisamchk_read_buffer            = '2M'
   $myisamchk_write_buffer           = '2M'
   $mysqlhotcopy_interactive_timeout = 'true'
-  $user_password                    = ''
+  $user_name                        = 'db_user'
+  $user_password                    = 'db_user'
   $user_database                    = '*'
   $user_host                        = 'localhost'
   $user_permissions                 = 'ALL'

@@ -33,7 +33,7 @@ class percona (
   $percona_version                  = $percona::params::percona_version,
   $client_package                   = $percona::params::os_percona_client_package,
   $client_ensure                    = $percona::params::percona_client_ensure,
-  $server_package                   = $percona::params::os_percona_client_package,
+  $server_package                   = $percona::params::os_percona_server_package,
   $server_ensure                    = $percona::params::percona_server_ensure,
   $service                          = $percona::params::os_percona_service,
   $service_ensure                   = $percona::params::percona_service_ensure,
@@ -53,6 +53,7 @@ class percona (
   $server_id                        = $percona::params::server_id,
   $server_ip                        = $percona::params::server_ip,
   $origin_ip                        = $percona::params::origin_ip,
+  $cluster_name                     = $percona::params::cluster_name,
   $allow_remote                     = $percona::params::allow_remote,
   $configure_firewall               = $percona::params::configure_firewall,
   $port                             = $percona::params::port,
@@ -88,11 +89,9 @@ class percona (
   $log_slave_updates                = $percona::params::log_slave_updates,
   $default_storage_engine           = $percona::params::default_storage_engine,
   $innodb_data_home_dir             = $percona::params::os_innodb_data_home_dir,
-  $innodb_data_file_path            = $percona::params::os_innodb_data_file_path,
   $innodb_log_group_home_dir        = $percona::params::os_innodb_log_group_home_dir,
   $innodb_buffer_pool_size          = $percona::params::innodb_buffer_pool_size,
   $innodb_additional_mem_pool_size  = $percona::params::innodb_additional_mem_pool_size,
-  $innodb_log_file_size             = $percona::params::innodb_log_file_size,
   $innodb_log_buffer_size           = $percona::params::innodb_log_buffer_size,
   $innodb_flush_log_at_trx_commit   = $percona::params::innodb_flush_log_at_trx_commit,
   $innodb_lock_wait_timeout         = $percona::params::innodb_lock_wait_timeout,
@@ -114,19 +113,10 @@ class percona (
   #-----------------------------------------------------------------------------
   # Installation
 
-  Package {
-    require => Class['percona::params'],
-  }
-
-  package { 'percona_common':
-    name   => $common_packages,
-    ensure => $common_ensure,
-  }
-
   package { 'percona_client':
     name    => $client_package,
     ensure  => $client_ensure,
-    require => Package['percona_common'],
+    require => Class['percona::params'],
   }
 
   if $server {
@@ -135,6 +125,12 @@ class percona (
       ensure  => $server_ensure,
       require => Package['percona_client'],
     }
+  }
+
+  package { 'percona_common':
+    name    => $common_packages,
+    ensure  => $common_ensure,
+    require => Package['percona_client'],
   }
 
   #-----------------------------------------------------------------------------

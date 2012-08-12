@@ -6,8 +6,8 @@ define percona::database (
   $host          = $percona::params::user_host,
   $port          = $percona::params::port,
   $sql_dump_file = $percona::params::database_sql_dump_file,
-  $user_name     = $name,
-  $password      = $name,
+  $user_name     = $percona::params::user_name,
+  $password      = $percona::params::user_password,
   $permissions   = $percona::params::user_permissions,
   $grant         = $percona::params::user_grant,
   $remote        = $percona::params::allow_remote,
@@ -55,19 +55,23 @@ define percona::database (
 
   if $user_name {
     Percona::User {
-      user_name => $user_name,
-      password  => $password,
-      database  => $database,
-      ensure    => present,
-      grant     => $grant,
+      ensure        => present,
+      host          => $host,
+      port          => $port,
+      user_name     => $user_name,
+      password      => $password,
+      database      => $database,
+      permissions   => $permissions,
+      grant         => $grant,
+      defaults_file => $defaults_file,
     }
 
-    percona::user { "${user_name}-local":
+    percona::user { "${user_name}-${database}-local":
       host => 'localhost',
     }
 
     if $remote == 'true' {
-      percona::user { "${user_name}-remote":
+      percona::user { "${user_name}-${database}-remote":
         host => '%',
       }
     }

@@ -15,6 +15,7 @@ class percona::params {
     $server_id                        = hiera('percona_server_id', $percona::default::server_id)
     $server_ip                        = hiera('percona_server_ip', $percona::default::server_ip)
     $origin_ip                        = hiera('percona_origin_ip', $percona::default::origin_ip)
+    $cluster_name                     = hiera('percona_cluster_name', $percona::default::cluster_name)
     $allow_remote                     = hiera('percona_allow_remote', $percona::default::allow_remote)
     $configure_firewall               = hiera('percona_configure_firewall', $percona::default::configure_firewall)
     $port                             = hiera('percona_port', $percona::default::port)
@@ -47,7 +48,6 @@ class percona::params {
     $default_storage_engine           = hiera('percona_default_storage_engine', $percona::default::default_storage_engine)
     $innodb_buffer_pool_size          = hiera('percona_innodb_buffer_pool_size', $percona::default::innodb_buffer_pool_size)
     $innodb_additional_mem_pool_size  = hiera('percona_innodb_additional_mem_pool_size', $percona::default::innodb_additional_mem_pool_size)
-    $innodb_log_file_size             = hiera('percona_innodb_log_file_size', $percona::default::innodb_log_file_size)
     $innodb_log_buffer_size           = hiera('percona_innodb_log_buffer_size', $percona::default::innodb_log_buffer_size)
     $innodb_flush_log_at_trx_commit   = hiera('percona_innodb_flush_log_at_trx_commit', $percona::default::innodb_flush_log_at_trx_commit)
     $innodb_lock_wait_timeout         = hiera('percona_innodb_lock_wait_timeout', $percona::default::innodb_lock_wait_timeout)
@@ -62,6 +62,7 @@ class percona::params {
     $myisamchk_read_buffer            = hiera('percona_myisamchk_read_buffer', $percona::default::myisamchk_read_buffer)
     $myisamchk_write_buffer           = hiera('percona_myisamchk_write_buffer', $percona::default::myisamchk_write_buffer)
     $mysqlhotcopy_interactive_timeout = hiera('percona_mysqlhotcopy_interactive_timeout', $percona::default::mysqlhotcopy_interactive_timeout)
+    $user_name                        = hiera('percona_user_name', $percona::default::user_name)
     $user_password                    = hiera('percona_user_password', $percona::default::user_password)
     $user_database                    = hiera('percona_user_database', $percona::default::user_database)
     $user_host                        = hiera('percona_user_host', $percona::default::user_host)
@@ -78,6 +79,7 @@ class percona::params {
     $server_id                        = $percona::default::server_id
     $server_ip                        = $percona::default::server_ip
     $origin_ip                        = $percona::default::origin_ip
+    $cluster_name                     = $percona::default::cluster_name
     $allow_remote                     = $percona::default::allow_remote
     $configure_firewall               = $percona::default::configure_firewall
     $port                             = $percona::default::port
@@ -110,7 +112,6 @@ class percona::params {
     $default_storage_engine           = $percona::default::default_storage_engine
     $innodb_buffer_pool_size          = $percona::default::innodb_buffer_pool_size
     $innodb_additional_mem_pool_size  = $percona::default::innodb_additional_mem_pool_size
-    $innodb_log_file_size             = $percona::default::innodb_log_file_size
     $innodb_log_buffer_size           = $percona::default::innodb_log_buffer_size
     $innodb_flush_log_at_trx_commit   = $percona::default::innodb_flush_log_at_trx_commit
     $innodb_lock_wait_timeout         = $percona::default::innodb_lock_wait_timeout
@@ -125,6 +126,7 @@ class percona::params {
     $myisamchk_read_buffer            = $percona::default::myisamchk_read_buffer
     $myisamchk_write_buffer           = $percona::default::myisamchk_write_buffer
     $mysqlhotcopy_interactive_timeout = $percona::default::mysqlhotcopy_interactive_timeout
+    $user_name                        = $percona::default::user_name
     $user_password                    = $percona::default::user_password
     $user_database                    = $percona::default::user_database
     $user_host                        = $percona::default::user_host
@@ -162,7 +164,7 @@ class percona::params {
 
       $os_run_dir                   = '/var/run/mysqld'
       $os_pid_file                  = "${os_run_dir}/mysqld.pid"
-      $os_socket                    = "${os_run_dir}/mysql.sock"
+      $os_socket                    = "${os_run_dir}/mysqld.sock"
 
       $os_mysqlchk_daemon           = '/usr/bin/clustercheck'
       $os_cluster_check_user        = 'clustercheckuser'
@@ -178,7 +180,6 @@ class percona::params {
       $os_wsrep_sst_method          = 'xtrabackup'
 
       $os_innodb_data_home_dir      = $os_lib_dir
-      $os_innodb_data_file_path     = 'ibdata1:10M:autoextend'
       $os_innodb_log_group_home_dir = $os_lib_dir
 
       #---
@@ -191,7 +192,7 @@ class percona::params {
       apt::sources_list { 'percona':
         ensure  => present,
         source  => false,
-        content => template ($os_sources_list_template),
+        content => template($os_sources_list_template),
         notify  => Exec['percona_apt_get_update'];
       }
 
