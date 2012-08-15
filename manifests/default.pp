@@ -1,10 +1,12 @@
 
 class percona::default {
-  $percona_version                  = '5.5'
-  $percona_client_ensure            = 'present'
-  $percona_server_ensure            = 'present'
-  $percona_common_ensure            = 'present'
-  $percona_service_ensure           = 'running'
+
+  $version                          = '5.5'
+  $client_ensure                    = 'present'
+  $server_ensure                    = 'present'
+  $common_ensure                    = 'present'
+  $service_ensure                   = 'running'
+
   $server_id                        = 1
   $server_ip                        = $::ipaddress
   $origin_ip                        = $::ipaddress
@@ -55,11 +57,63 @@ class percona::default {
   $myisamchk_read_buffer            = '2M'
   $myisamchk_write_buffer           = '2M'
   $mysqlhotcopy_interactive_timeout = 'true'
+
   $user_name                        = 'db_user'
   $user_password                    = 'db_user'
   $user_database                    = '*'
   $user_host                        = 'localhost'
   $user_permissions                 = 'ALL'
   $user_grant                       = 'true'
+
   $database_sql_dump_file           = ''
+
+  #---
+
+  case $::operatingsystem {
+    debian, ubuntu: {
+      $apt_key         = 'CD2EFD2A'
+      $client_package  = "percona-xtradb-cluster-client-${version}"
+      $server_package  = "percona-xtradb-cluster-server-${version}"
+      $service         = 'mysql'
+
+      $common_packages = [
+        'percona-xtrabackup',
+        'percona-toolkit',
+      ]
+
+      $defaults_file             = '/etc/mysql/debian.cnf'
+
+      $config                    = '/etc/mysql/my.cnf'
+      $conf_dir                  = '/etc/mysql/conf.d'
+
+      $log_dir                   = '/var/log/percona'
+      $error_log                 = "${log_dir}/mysqld.log"
+
+      $lib_dir                   = '/var/lib/mysql'
+      $data_dir                  = $lib_dir
+
+      $run_dir                   = '/var/run/mysqld'
+      $pid_file                  = "${run_dir}/mysqld.pid"
+      $socket                    = "${run_dir}/mysqld.sock"
+
+      $mysqlchk_daemon           = '/usr/bin/clustercheck'
+      $cluster_check_user        = 'clustercheckuser'
+      $cluster_check_password    = 'clustercheckpassword!'
+
+      $sources_list_template     = 'percona/sources.list.erb'
+      $config_template           = 'percona/my.cnf.erb'
+
+      $log_bin                   = 'mysql-bin'
+      $binlog_format             = 'ROW'
+
+      $wsrep_provider            = '/usr/lib/libgalera_smm.so'
+      $wsrep_sst_method          = 'xtrabackup'
+
+      $innodb_data_home_dir      = $lib_dir
+      $innodb_log_group_home_dir = $lib_dir
+    }
+    default: {
+      fail("The percona module is not currently supported on ${::operatingsystem}")
+    }
+  }
 }

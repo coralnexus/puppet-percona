@@ -5,7 +5,7 @@ define percona::conf (
   $ensure   = 'present',
   $user     = $percona::params::user,
   $group    = $percona::params::group,
-  $conf_dir = $percona::params::os_conf_dir,
+  $conf_dir = $percona::params::conf_dir,
 
 ) {
 
@@ -17,7 +17,7 @@ define percona::conf (
     ensure  => $ensure,
     owner   => $user,
     group   => $group,
-    mode    => 600,
+    mode    => '0640',
     content => $content,
     require => File['percona_config'],
     notify  => Service['mysql'],

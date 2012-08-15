@@ -30,26 +30,29 @@
 class percona (
 
   $server                           = false,
-  $percona_version                  = $percona::params::percona_version,
-  $client_package                   = $percona::params::os_percona_client_package,
-  $client_ensure                    = $percona::params::percona_client_ensure,
-  $server_package                   = $percona::params::os_percona_server_package,
-  $server_ensure                    = $percona::params::percona_server_ensure,
-  $service                          = $percona::params::os_percona_service,
-  $service_ensure                   = $percona::params::percona_service_ensure,
-  $common_packages                  = $percona::params::os_percona_common_packages,
-  $common_ensure                    = $percona::params::percona_common_ensure,
-  $config                           = $percona::params::os_config,
-  $conf_dir                         = $percona::params::os_conf_dir,
-  $log_dir                          = $percona::params::os_log_dir,
-  $error_log                        = $percona::params::os_error_log,
-  $lib_dir                          = $percona::params::os_lib_dir,
-  $socket                           = $percona::params::os_socket,
-  $data_dir                         = $percona::params::os_data_dir,
-  $pid_file                         = $percona::params::os_pid_file,
-  $mysqlchk_daemon                  = $percona::params::os_mysqlchk_daemon,
-  $cluster_check_user               = $percona::params::os_cluster_check_user,
-  $cluster_check_password           = $percona::params::os_cluster_check_password,
+  $apt_key                          = $percona::params::apt_key,
+  $sources_list_template            = $percona::params::sources_list_template,
+  $version                          = $percona::params::version,
+  $client_package                   = $percona::params::client_package,
+  $client_ensure                    = $percona::params::client_ensure,
+  $server_package                   = $percona::params::server_package,
+  $server_ensure                    = $percona::params::server_ensure,
+  $service                          = $percona::params::service,
+  $service_ensure                   = $percona::params::service_ensure,
+  $common_packages                  = $percona::params::common_packages,
+  $common_ensure                    = $percona::params::common_ensure,
+  $config                           = $percona::params::config,
+  $config_template                  = $percona::params::config_template,
+  $conf_dir                         = $percona::params::conf_dir,
+  $log_dir                          = $percona::params::log_dir,
+  $error_log                        = $percona::params::error_log,
+  $lib_dir                          = $percona::params::lib_dir,
+  $socket                           = $percona::params::socket,
+  $data_dir                         = $percona::params::data_dir,
+  $pid_file                         = $percona::params::pid_file,
+  $mysqlchk_daemon                  = $percona::params::mysqlchk_daemon,
+  $cluster_check_user               = $percona::params::cluster_check_user,
+  $cluster_check_password           = $percona::params::cluster_check_password,
   $server_id                        = $percona::params::server_id,
   $server_ip                        = $percona::params::server_ip,
   $origin_ip                        = $percona::params::origin_ip,
@@ -72,10 +75,10 @@ class percona (
   $query_cache_size                 = $percona::params::query_cache_size,
   $thread_concurrency               = $percona::params::thread_concurrency,
   $skip_networking                  = $percona::params::skip_networking,
-  $log_bin                          = $percona::params::os_log_bin,
-  $binlog_format                    = $percona::params::os_binlog_format,
-  $wsrep_provider                   = $percona::params::os_wsrep_provider,
-  $wsrep_sst_method                 = $percona::params::os_wsrep_sst_method,
+  $log_bin                          = $percona::params::log_bin,
+  $binlog_format                    = $percona::params::binlog_format,
+  $wsrep_provider                   = $percona::params::wsrep_provider,
+  $wsrep_sst_method                 = $percona::params::wsrep_sst_method,
   $wsrep_slave_threads              = $percona::params::wsrep_slave_threads,
   $wsrep_certify_non_pk             = $percona::params::wsrep_certify_non_pk,
   $wsrep_max_ws_rows                = $percona::params::wsrep_max_ws_rows,
@@ -88,8 +91,8 @@ class percona (
   $wsrep_notify_cmd                 = $percona::params::wsrep_notify_cmd,
   $log_slave_updates                = $percona::params::log_slave_updates,
   $default_storage_engine           = $percona::params::default_storage_engine,
-  $innodb_data_home_dir             = $percona::params::os_innodb_data_home_dir,
-  $innodb_log_group_home_dir        = $percona::params::os_innodb_log_group_home_dir,
+  $innodb_data_home_dir             = $percona::params::innodb_data_home_dir,
+  $innodb_log_group_home_dir        = $percona::params::innodb_log_group_home_dir,
   $innodb_buffer_pool_size          = $percona::params::innodb_buffer_pool_size,
   $innodb_additional_mem_pool_size  = $percona::params::innodb_additional_mem_pool_size,
   $innodb_log_buffer_size           = $percona::params::innodb_log_buffer_size,
@@ -106,17 +109,23 @@ class percona (
   $myisamchk_read_buffer            = $percona::params::myisamchk_read_buffer,
   $myisamchk_write_buffer           = $percona::params::myisamchk_write_buffer,
   $mysqlhotcopy_interactive_timeout = $percona::params::mysqlhotcopy_interactive_timeout,
-  $config_template                  = $percona::params::os_config_template,
 
 ) inherits percona::params {
 
   #-----------------------------------------------------------------------------
   # Installation
 
+  class { 'percona::preinstall':
+    apt_key               => $apt_key,
+    sources_list_template => $sources_list_template,
+  }
+
+  #---
+
   package { 'percona_client':
     name    => $client_package,
     ensure  => $client_ensure,
-    require => Class['percona::params'],
+    require => Class['percona::preinstall'],
   }
 
   if $server {

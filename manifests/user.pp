@@ -9,7 +9,7 @@ define percona::user (
   $port          = $percona::params::port,
   $permissions   = $percona::params::user_permissions,
   $grant         = $percona::params::user_grant,
-  $defaults_file = $percona::params::os_defaults_file,
+  $defaults_file = $percona::params::defaults_file,
 
 ) {
 

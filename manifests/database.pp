@@ -11,7 +11,7 @@ define percona::database (
   $permissions   = $percona::params::user_permissions,
   $grant         = $percona::params::user_grant,
   $remote        = $percona::params::allow_remote,
-  $defaults_file = $percona::params::os_defaults_file,
+  $defaults_file = $percona::params::defaults_file,
 
 ) {
 
