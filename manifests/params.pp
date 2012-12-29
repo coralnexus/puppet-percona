@@ -8,7 +8,7 @@ class percona::params inherits percona::default {
   $client_ensure                    = module_param('client_ensure')
   $server_package                   = module_param('server_package')
   $server_ensure                    = module_param('server_ensure')
-  $common_packages                  = module_param('common_packages')
+  $common_packages                  = module_array('common_packages')
   $common_ensure                    = module_param('common_ensure')
   $service                          = module_param('service')
   $service_ensure                   = module_param('service_ensure')

@@ -9,7 +9,7 @@ class percona::default {
 
   $server_id                        = 1
   $server_ip                        = $::ipaddress
-  $origin_ip                        = $::ipaddress
+  $origin_ip                        = ''
   $cluster_name                     = 'default'
   $allow_remote                     = 'true'
   $configure_firewall               = 'true'
@@ -28,7 +28,7 @@ class percona::default {
   $thread_cache_size                = '8'
   $query_cache_size                 = '16M'
   $thread_concurrency               = '8'
-  $skip_networking                  = 'true'
+  $skip_networking                  = 'false'
   $wsrep_slave_threads              = '2'
   $wsrep_certify_non_pk             = '1'
   $wsrep_max_ws_rows                = '131072'

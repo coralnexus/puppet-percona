@@ -25,7 +25,7 @@
   "percona_thread_cache_size" : "8",
   "percona_query_cache_size" : "16M",
   "percona_thread_concurrency" : "8",
-  "percona_skip_networking" : "true",
+  "percona_skip_networking" : "false",
   "percona_wsrep_slave_threads" : "2",
   "percona_wsrep_certify_non_pk" : "1",
   "percona_wsrep_max_ws_rows" : "131072",
