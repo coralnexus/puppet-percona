@@ -7,28 +7,17 @@ class percona::default {
   $common_ensure                    = 'present'
   $service_ensure                   = 'running'
 
-  $server_id                        = 1
+  $server_id                        = $::ipaddress
   $server_ip                        = $::ipaddress
-  $origin_ip                        = ''
-  $cluster_name                     = 'default'
+  $origin_addresses                 = ''
+  $cluster_name                     = 'test'
   $allow_remote                     = 'true'
   $configure_firewall               = 'true'
+  $percona_ports                    = [ 4444, 4567, 4568 ]
   $port                             = 3306
   $mysqlchk_port                    = 9200
   $user                             = 'mysql'
   $group                            = 'mysql'
-  $skip_external_locking            = 'true'
-  $key_buffer_size                  = '256M'
-  $max_allowed_packet               = '1M'
-  $table_open_cache                 = '256'
-  $sort_buffer_size                 = '1M'
-  $read_buffer_size                 = '1M'
-  $read_rnd_buffer_size             = '4M'
-  $myisam_sort_buffer_size          = '64M'
-  $thread_cache_size                = '8'
-  $query_cache_size                 = '16M'
-  $thread_concurrency               = '8'
-  $skip_networking                  = 'false'
   $wsrep_slave_threads              = '2'
   $wsrep_certify_non_pk             = '1'
   $wsrep_max_ws_rows                = '131072'
@@ -39,24 +28,10 @@ class percona::default {
   $wsrep_auto_increment_control     = '1'
   $wsrep_causal_reads               = '0'
   $wsrep_notify_cmd                 = ''
-  $log_slave_updates                = 'true'
   $default_storage_engine           = 'innodb'
-  $innodb_buffer_pool_size          = '256M'
-  $innodb_additional_mem_pool_size  = '20M'
-  $innodb_log_buffer_size           = '8M'
   $innodb_flush_log_at_trx_commit   = '1'
-  $innodb_lock_wait_timeout         = '50'
   $innodb_autoinc_lock_mode         = '2'
   $innodb_locks_unsafe_for_binlog   = '1'
-  $mysql_no_auto_rehash             = 'true'
-  $mysql_safe_updates               = 'false'
-  $mysqldump_quick                  = 'true'
-  $mysqldump_max_allowed_packet     = '16M'
-  $myisamchk_key_buffer_size        = '128M'
-  $myisamchk_sort_buffer_size       = '128M'
-  $myisamchk_read_buffer            = '2M'
-  $myisamchk_write_buffer           = '2M'
-  $mysqlhotcopy_interactive_timeout = 'true'
 
   $user_name                        = 'db_user'
   $user_password                    = 'db_user'
@@ -66,6 +41,51 @@ class percona::default {
   $user_grant                       = 'true'
 
   $database_sql_dump_file           = ''
+
+  $root_user                        = 'root'
+  $root_password                    = '%t3St%'
+
+  $mysql_user                       = 'mysql'
+  $mysql_password                   = '%mYSqL%'
+
+  $configurations                   = {
+    "mysql" => {
+      "no-auto-rehash" => "",
+      "safe-updates" => "",
+    },
+    "mysqld" => {
+      "key_buffer_size" => "256M",
+      "max_allowed_packet" => "1M",
+      "table_open_cache" => "256",
+      "sort_buffer_size" => "1M",
+      "read_buffer_size" => "1M",
+      "read_rnd_buffer_size" => "4M",
+      "myisam_sort_buffer_size" => "64M",
+      "query_cache_size" => "16M",
+      "thread_cache_size" => "8",
+      "thread_concurrency" => "8",
+      "innodb_buffer_pool_size" => "256M",
+      "innodb_additional_mem_pool_size" => "20M",
+      "innodb_log_buffer_size" => "8M",
+      "innodb_lock_wait_timeout" => "50",
+      "log-slave-updates" => "",
+      "skip-external-locking" => "",
+      "skip-networking" => "",
+    },
+    "mysqldump" => {
+      "quick" => "true",
+      "max_allowed_packet" => "16M",
+    },
+    "myisamchk" => {
+      "key_buffer_size" => "128M",
+      "sort_buffer_size" => "128M",
+      "read_buffer" => "2M",
+      "write_buffer" => "2M",
+    },
+    "mysqlhotcopy" => {
+      "interactive-timeout" => "",
+    },
+  }
 
   #---
 
@@ -81,9 +101,8 @@ class percona::default {
         'percona-toolkit',
       ]
 
-      $defaults_file             = '/etc/mysql/debian.cnf'
-
       $config                    = '/etc/mysql/my.cnf'
+      $user_config               = '/etc/mysql/debian.cnf'
       $conf_dir                  = '/etc/mysql/conf.d'
 
       $log_dir                   = '/var/log/percona'
@@ -102,6 +121,7 @@ class percona::default {
 
       $sources_list_template     = 'percona/sources.list.erb'
       $config_template           = 'percona/my.cnf.erb'
+      $generic_template          = 'percona/generic.cnf.erb'
 
       $log_bin                   = 'mysql-bin'
       $binlog_format             = 'ROW'
