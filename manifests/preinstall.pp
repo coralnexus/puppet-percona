@@ -2,7 +2,7 @@
 class percona::preinstall (
 
   $apt_key               = $percona::params::apt_key,
-  $sources_list_template = $percona::params::sources_list_template,
+  $sources_list_template = $percona::params::sources_list_template
 
 ) inherits percona::params {
 
