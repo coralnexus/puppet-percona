@@ -1,11 +1,12 @@
 
 define percona::conf (
 
-  $content  = '',
-  $ensure   = 'present',
-  $user     = $percona::params::user,
-  $group    = $percona::params::group,
-  $conf_dir = $percona::params::conf_dir,
+  $configurations = {},
+  $ensure         = 'present',
+  $user           = $percona::params::user,
+  $group          = $percona::params::group,
+  $conf_dir       = $percona::params::conf_dir,
+  $template       = $percona::params::generic_template
 
 ) {
 
@@ -17,8 +18,8 @@ define percona::conf (
     ensure  => $ensure,
     owner   => $user,
     group   => $group,
-    mode    => '0640',
-    content => $content,
+    mode    => 0640,
+    content => template($template),
     require => File['percona_config'],
     notify  => Service['mysql'],
   }
