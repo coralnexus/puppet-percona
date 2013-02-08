@@ -9,7 +9,9 @@ define percona::user (
   $port          = $percona::params::port,
   $permissions   = $percona::params::user_permissions,
   $grant         = $percona::params::user_grant,
-  $defaults_file = $percona::params::defaults_file,
+  $defaults_file = $percona::params::user_config,
+  $root_user     = $percona::params::root_user,
+  $root_password = $percona::params::root_password
 
 ) {
 
@@ -24,25 +26,66 @@ define percona::user (
 
   case $ensure {
     'present': {
+
       $grant_option = $grant ? {
         'true'  => 'WITH GRANT OPTION',
         default => '',
       }
 
-      $message = "MySQL: Grant ${user_name}@${host}:${database} ${grant_option}"
-
-      if ! defined(Exec[$message]) {
-        exec { $message:
-          command => "mysql --defaults-file=${defaults_file} --port=${port} --execute=\"GRANT ${permissions} ON ${database}.* TO '${user_name}'@'${host}' IDENTIFIED BY '${password}' ${grant_option}\";",
-          unless  => "mysql --user=${user_name} --password=${password} --database=${database} --port=${port}",
+      if $database == '*' {
+        percona::query { "ensure-${user_name}-${host}-privileges":
+          query         => "GRANT ${permissions} ON *.* TO '${user_name}'@'${host}' IDENTIFIED BY '${password}' ${grant_option}; FLUSH PRIVILEGES",
+          port          => $port,
+          access        => 'unless',
+          condition     => "SELECT * FROM user WHERE User = '${user_name}' AND Host = '${host}'",
+          database      => 'mysql',
+          defaults_file => $defaults_file,
+          exec_user     => $root_user,
+          exec_passwd   => $root_password,
+          require       => Percona::Query['update-root-password'],
         }
+      }
+      else {
+        percona::query { "ensure-${user_name}-${host}-privileges":
+          query         => "GRANT ${permissions} ON ${database}.* TO '${user_name}'@'${host}' IDENTIFIED BY '${password}' ${grant_option}; FLUSH PRIVILEGES",
+          port          => $port,
+          access        => 'unless',
+          condition     => "SELECT * FROM db WHERE Db = '${database}' AND User = '${user_name}' AND Host = '${host}'",
+          database      => 'mysql',
+          defaults_file => $defaults_file,
+          exec_user     => $root_user,
+          exec_passwd   => $root_password,
+          require       => Percona::Query['update-root-password'],
+        }
+      }
+
+      #---
+
+      percona::query { "update-${user_name}-${host}-password":
+        query         => "UPDATE user SET Password = PASSWORD('${password}') WHERE User = '${user_name}' AND Host = '${host}'; FLUSH PRIVILEGES",
+        access        => 'unless',
+        condition     => "SELECT * FROM user WHERE User = '${user_name}' AND Host = '${host}' AND Password = PASSWORD('${password}')",
+        port          => $port,
+        database      => 'mysql',
+        defaults_file => $defaults_file,
+        exec_user     => $root_user,
+        exec_passwd   => $root_password,
+        require       => Percona::Query["ensure-${user_name}-${host}-privileges"],
       }
     }
 
     'absent': {
-      exec { "MySQL: drop user ${user_name}":
-        command => "mysql --defaults-file=${defaults_file} --port=${port} --execute=\"DROP USER ${user_name}\";",
-        onlyif  => "mysql --user=${user_name} --password=${password} --port=${port}",
+      percona::query { "drop-${user_name}":
+        query         => "DROP USER ${user_name}",
+        port          => $port,
+        access        => 'onlyif',
+        user_name     => $user_name,
+        password      => $password,
+        database      => undef,
+        defaults_file => $defaults_file,
+        exec_user     => $root_user,
+        exec_passwd   => $root_password,
+        require       => Percona::Query['update-root-password'],
       }
     }
   }
