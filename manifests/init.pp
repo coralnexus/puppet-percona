@@ -30,8 +30,10 @@
 class percona (
 
   $server                           = false,
+  $apt_location                     = $percona::params::apt_location,
+  $apt_repos                        = $percona::params::apt_repos,
   $apt_key                          = $percona::params::apt_key,
-  $sources_list_template            = $percona::params::sources_list_template,
+  $apt_key_server                   = $percona::params::apt_key_server,
   $version                          = $percona::params::version,
   $client_package                   = $percona::params::client_package,
   $client_ensure                    = $percona::params::client_ensure,
@@ -56,7 +58,7 @@ class percona (
   $cluster_check_password           = $percona::params::cluster_check_password,
   $server_id                        = $percona::params::server_id,
   $server_ip                        = $percona::params::server_ip,
-  $origin_addresses                 = $percona::params::origin_addresses,
+  $origin_ip                        = $percona::params::origin_ip,
   $cluster_name                     = $percona::params::cluster_name,
   $allow_remote                     = $percona::params::allow_remote,
   $configure_firewall               = $percona::params::configure_firewall,
@@ -95,9 +97,16 @@ class percona (
   #-----------------------------------------------------------------------------
   # Installation
 
-  class { 'percona::preinstall':
-    apt_key               => $apt_key,
-    sources_list_template => $sources_list_template,
+  case $::operatingsystem {
+    debian, ubuntu: {
+      apt::source { 'percona':
+        location   => $apt_location,
+        repos      => $apt_repos,
+        key        => $apt_key,
+        key_server => $apt_key_server
+      }
+      Apt::Source['percona'] -> Package['percona_client']
+    }
   }
 
   #---
@@ -125,7 +134,7 @@ class percona (
   #-----------------------------------------------------------------------------
   # Configuration
 
-  if $server and $configure_firewall == 'true' {
+  if $server and $configure_firewall {
     if $port {
       firewall { "400 INPUT Allow new MySQL connections":
         action => 'accept',
@@ -169,7 +178,7 @@ class percona (
 
   #---
 
-  if ! $origin_addresses {
+  if ! $origin_ip {
     percona::query { 'update-root-password':
       query         => "UPDATE user SET Password = PASSWORD('${root_password}') WHERE User = '${root_user}'; FLUSH PRIVILEGES",
       access        => 'onlyif',

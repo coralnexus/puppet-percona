@@ -1,8 +1,11 @@
 
 class percona::params inherits percona::default {
 
+  $apt_location                     = module_param('apt_location')
+  $apt_repos                        = module_param('apt_repos')
   $apt_key                          = module_param('apt_key')
-  $sources_list_template            = module_param('sources_list_template')
+  $apt_key_server                   = module_param('apt_key_server')
+
   $version                          = module_param('version')
   $client_package                   = module_param('client_package')
   $client_ensure                    = module_param('client_ensure')
@@ -38,7 +41,7 @@ class percona::params inherits percona::default {
 
   $server_id                        = module_param('server_id')
   $server_ip                        = module_param('server_ip')
-  $origin_addresses                 = module_param('origin_addresses')
+  $origin_ip                        = module_param('origin_ip')
   $cluster_name                     = module_param('cluster_name')
   $allow_remote                     = module_param('allow_remote')
   $configure_firewall               = module_param('configure_firewall')

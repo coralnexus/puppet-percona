@@ -28,7 +28,7 @@ define percona::user (
     'present': {
 
       $grant_option = $grant ? {
-        'true'  => 'WITH GRANT OPTION',
+        true    => 'WITH GRANT OPTION',
         default => '',
       }
 

@@ -39,7 +39,7 @@ define percona::database (
         unless  => "mysql --defaults-file=${defaults_file} --port=${port} --execute=\"SHOW DATABASES;\" | grep -x '${database}'",
       }
 
-      if $sql_dump_file and exists($sql_dump_file) {
+      if $sql_dump_file and file_exists($sql_dump_file) {
         exec { "MySQL import $database db":
           command => "mysql --defaults-file=${defaults_file} ${database} --port=${port} < ${sql_dump_file}",
           require => Exec["MySQL create $database db"],
@@ -74,7 +74,7 @@ define percona::database (
       host => 'localhost',
     }
 
-    if $remote == 'true' {
+    if $remote {
       percona::user { "${user_name}-${database}-remote":
         host => '%',
       }

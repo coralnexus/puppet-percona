@@ -18,7 +18,7 @@ define percona::conf (
     ensure  => $ensure,
     owner   => $user,
     group   => $group,
-    mode    => 0640,
+    mode    => '0640',
     content => template($template),
     require => File['percona_config'],
     notify  => Service['mysql'],

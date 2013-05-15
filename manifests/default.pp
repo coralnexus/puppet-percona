@@ -9,10 +9,11 @@ class percona::default {
 
   $server_id                        = $::ipaddress
   $server_ip                        = $::ipaddress
-  $origin_addresses                 = ''
+  $origin_ip                        = ''
+
   $cluster_name                     = 'test'
-  $allow_remote                     = 'true'
-  $configure_firewall               = 'true'
+  $allow_remote                     = true
+  $configure_firewall               = true
   $percona_ports                    = [ 4444, 4567, 4568 ]
   $port                             = 3306
   $mysqlchk_port                    = 9200
@@ -38,7 +39,7 @@ class percona::default {
   $user_database                    = '*'
   $user_host                        = 'localhost'
   $user_permissions                 = 'ALL'
-  $user_grant                       = 'true'
+  $user_grant                       = true
 
   $database_sql_dump_file           = ''
 
@@ -91,7 +92,11 @@ class percona::default {
 
   case $::operatingsystem {
     debian, ubuntu: {
+      $apt_location    = 'http://repo.percona.com/apt'
+      $apt_repos       = 'main'
       $apt_key         = 'CD2EFD2A'
+      $apt_key_server  = 'keys.gnupg.net'
+
       $client_package  = "percona-xtradb-cluster-client-${version}"
       $server_package  = "percona-xtradb-cluster-server-${version}"
       $service         = 'mysql'
@@ -119,7 +124,6 @@ class percona::default {
       $cluster_check_user        = 'clustercheckuser'
       $cluster_check_password    = 'clustercheckpassword!'
 
-      $sources_list_template     = 'percona/sources.list.erb'
       $config_template           = 'percona/my.cnf.erb'
       $generic_template          = 'percona/generic.cnf.erb'
 
