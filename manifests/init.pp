@@ -218,17 +218,17 @@ class percona (
     }
 
     xinetd::service { 'mysqlchk':
-      server             => $mysqlchk_daemon,
-      port               => $mysqlchk_port,
-      disable            => 'no',
-      flags              => 'REUSE',
-      socket_type        => 'stream',
-      wait               => 'no',
-      user               => 'nobody',
-      log_on_failure     => 'USERID',
-      per_source         => 'UNLIMITED',
-      configure_firewall => $configure_firewall,
-      service_ports      => [],
+      attributes => {
+        server         => $mysqlchk_daemon,
+        port           => $mysqlchk_port,
+        disable        => 'no',
+        flags          => 'REUSE',
+        socket_type    => 'stream',
+        wait           => 'no',
+        user           => 'nobody',
+        log_on_failure => '+= USERID',
+        per_source     => 'UNLIMITED'
+      }
     }
   }
 
