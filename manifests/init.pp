@@ -161,6 +161,7 @@ class percona (
     file { 'percona_conf_dir':
       path   => $conf_dir,
       ensure => directory,
+      mode   => '0700',
       require => Package['percona_server']
     }
 
