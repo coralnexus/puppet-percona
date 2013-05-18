@@ -7,9 +7,9 @@ class percona::default {
   $common_ensure                    = 'present'
   $service_ensure                   = 'running'
 
-  $server_id                        = $::ipaddress
+  $server_id                        = 1
   $server_ip                        = $::ipaddress
-  $origin_ip                        = ''
+  $origin_addresses                 = ''
 
   $cluster_name                     = 'test'
   $allow_remote                     = true
@@ -17,7 +17,7 @@ class percona::default {
   $percona_ports                    = [ 4444, 4567, 4568 ]
   $port                             = 3306
   $mysqlchk_port                    = 9200
-  $user                             = 'mysql'
+  $user_name                        = 'mysql'
   $group                            = 'mysql'
   $wsrep_slave_threads              = '2'
   $wsrep_certify_non_pk             = '1'
@@ -34,7 +34,6 @@ class percona::default {
   $innodb_autoinc_lock_mode         = '2'
   $innodb_locks_unsafe_for_binlog   = '1'
 
-  $user_name                        = 'db_user'
   $user_password                    = 'db_user'
   $user_database                    = '*'
   $user_host                        = 'localhost'
@@ -70,11 +69,10 @@ class percona::default {
       "innodb_log_buffer_size" => "8M",
       "innodb_lock_wait_timeout" => "50",
       "log-slave-updates" => "",
-      "skip-external-locking" => "",
-      "skip-networking" => "",
+      "skip-external-locking" => ""
     },
     "mysqldump" => {
-      "quick" => "true",
+      "quick" => true,
       "max_allowed_packet" => "16M",
     },
     "myisamchk" => {
