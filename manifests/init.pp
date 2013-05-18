@@ -58,14 +58,14 @@ class percona (
   $cluster_check_password           = $percona::params::cluster_check_password,
   $server_id                        = $percona::params::server_id,
   $server_ip                        = $percona::params::server_ip,
-  $origin_ip                        = $percona::params::origin_ip,
+  $origin_addresses                 = $percona::params::origin_addresses,
   $cluster_name                     = $percona::params::cluster_name,
   $allow_remote                     = $percona::params::allow_remote,
   $configure_firewall               = $percona::params::configure_firewall,
   $percona_ports                    = $percona::params::percona_ports,
   $port                             = $percona::params::port,
   $mysqlchk_port                    = $percona::params::mysqlchk_port,
-  $user                             = $percona::params::user,
+  $user_name                        = $percona::params::user_name,
   $group                            = $percona::params::group,
   $log_bin                          = $percona::params::log_bin,
   $binlog_format                    = $percona::params::binlog_format,
@@ -113,8 +113,7 @@ class percona (
 
   package { 'percona_client':
     name    => $client_package,
-    ensure  => $client_ensure,
-    require => Class['percona::preinstall'],
+    ensure  => $client_ensure
   }
 
   if $server {
@@ -152,33 +151,36 @@ class percona (
 
   #---
 
-  File {
-    owner   => $user,
-    group   => $group,
-    require => Package['percona_server'],
-    notify  => Service['mysql'],
-  }
+  if $server {
+    File {
+      owner   => $user_name,
+      group   => $group,
+      notify  => Service['mysql'],
+    }
 
-  file { 'percona_conf_dir':
-    path   => $conf_dir,
-    ensure => directory,
-  }
+    file { 'percona_conf_dir':
+      path   => $conf_dir,
+      ensure => directory,
+      require => Package['percona_server']
+    }
 
-  file { 'percona_data_dir':
-    path   => $data_dir,
-    ensure => directory,
-    mode   => '0700';
-  }
+    file { 'percona_data_dir':
+      path   => $data_dir,
+      ensure => directory,
+      mode   => '0700',
+      require => Package['percona_server']
+    }
 
-  file { 'percona_config':
-    path    => $config,
-    content => template($config_template),
-    require => File['percona_conf_dir'],
+    file { 'percona_config':
+      path    => $config,
+      content => template($config_template),
+      require => File['percona_conf_dir'],
+    }
   }
 
   #---
 
-  if ! $origin_ip {
+  if ! $origin_addresses {
     percona::query { 'update-root-password':
       query         => "UPDATE user SET Password = PASSWORD('${root_password}') WHERE User = '${root_user}'; FLUSH PRIVILEGES",
       access        => 'onlyif',
@@ -205,7 +207,7 @@ class percona (
   #---
 
   if $server and defined(Class['xinetd']) {
-    if ! $origin_ip {
+    if ! $origin_addresses {
       percona::user { $cluster_check_user:
         password    => $cluster_check_password,
         ensure      => 'present',
@@ -218,6 +220,7 @@ class percona (
     }
 
     xinetd::service { 'mysqlchk':
+      service    => 'mysqlchk',
       attributes => {
         server         => $mysqlchk_daemon,
         port           => $mysqlchk_port,

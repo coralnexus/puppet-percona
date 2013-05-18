@@ -41,14 +41,14 @@ class percona::params inherits percona::default {
 
   $server_id                        = module_param('server_id')
   $server_ip                        = module_param('server_ip')
-  $origin_ip                        = module_param('origin_ip')
+  $origin_addresses                 = module_param('origin_addresses')
   $cluster_name                     = module_param('cluster_name')
   $allow_remote                     = module_param('allow_remote')
   $configure_firewall               = module_param('configure_firewall')
   $percona_ports                    = module_array('percona_ports')
   $port                             = module_param('port')
   $mysqlchk_port                    = module_param('mysqlchk_port')
-  $user                             = module_param('user')
+  $user_name                        = module_param('user_name')
   $group                            = module_param('group')
   $log_bin                          = module_param('log_bin')
   $binlog_format                    = module_param('binlog_format')
@@ -81,7 +81,6 @@ class percona::params inherits percona::default {
 
   #---
 
-  $user_name                        = module_param('user_name')
   $user_password                    = module_param('user_password')
   $user_database                    = module_param('user_database')
   $user_host                        = module_param('user_host')

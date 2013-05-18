@@ -3,7 +3,7 @@ define percona::conf (
 
   $configurations = {},
   $ensure         = 'present',
-  $user           = $percona::params::user,
+  $user_name      = $percona::params::user_name,
   $group          = $percona::params::group,
   $conf_dir       = $percona::params::conf_dir,
   $template       = $percona::params::generic_template
@@ -16,7 +16,7 @@ define percona::conf (
 
   file { "${conf_dir}/${name}.cnf":
     ensure  => $ensure,
-    owner   => $user,
+    owner   => $user_name,
     group   => $group,
     mode    => '0640',
     content => template($template),
