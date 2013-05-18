@@ -9,27 +9,30 @@ class PerconaTemplate
   #-----------------------------------------------------------------------------
   # Constructor / Destructor
   
-  def initialize
+  def initialize(configurations)
     @@blocks = {}
     configurations.each do |name, data|
       @@blocks[name] = PerconaTemplate.block(name, data)
-    end  
+    end
+    dbg(@@blocks, 'blocks')  
   end
   
   #-----------------------------------------------------------------------------
   # Renderers  
   
   def self.render(name = '', render_type = true, remove = true)
-    if name && ! name.empty?
-      output = ''
-      if @@blocks[name].is_a?(String)
-        if render_type
-          output << "[#{type}]\n"
+    output = ''
+    if ! name.empty?
+      unless Coral::Util::Data.empty?(@@blocks[name])    
+        if @@blocks[name].is_a?(String)
+          if render_type
+            output << "[#{name}]\n"
+          end
+          output << @@blocks[name]  
         end
-        output << @@blocks[name]  
-      end
-      if remove
-        @@blocks.delete(name)
+        if remove
+          @@blocks.delete(name)
+        end
       end
     else
       @@blocks.each do |name, block|
@@ -45,13 +48,13 @@ class PerconaTemplate
     output = ''        
     if input.is_a?(Hash)
       input.each do |keyword, data|
-        if ! data || data.is_empty?
+        if Coral::Util::Data.empty?(data)
           output << "#{keyword}\n"
         else
           if data.is_a?(Array)
             output << "#{keyword} = " << data.join(',') << "\n"              
-          elsif data.is_a?(String)
-            output << "#{keyword} = #{data}\n"
+          else
+            output << "#{keyword} = #{data.to_s}\n"
           end
         end
       end        
