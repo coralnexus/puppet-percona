@@ -14,7 +14,6 @@ class PerconaTemplate
     configurations.each do |name, data|
       @@blocks[name] = PerconaTemplate.block(name, data)
     end
-    dbg(@@blocks, 'blocks')  
   end
   
   #-----------------------------------------------------------------------------
