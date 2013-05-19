@@ -216,8 +216,9 @@ class percona (
         port        => $port,
         database    => '*',
         permissions => 'PROCESS',
-        grant       => false,
+        grant       => false
       }
+      Percona::User[$cluster_check_user] -> Xinetd::Service['mysqlchk']
     }
 
     xinetd::service { 'mysqlchk':
