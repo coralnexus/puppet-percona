@@ -20,7 +20,6 @@ define percona::query (
   #-----------------------------------------------------------------------------
 
   Exec {
-    path    => [ '/bin', '/usr/bin' ],
     require => Service['mysql'],
   }
 

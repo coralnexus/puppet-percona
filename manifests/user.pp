@@ -15,14 +15,7 @@ define percona::user (
 
 ) {
 
-  include percona
-
   #-----------------------------------------------------------------------------
-
-  Exec {
-    path    => [ '/bin', '/usr/bin' ],
-    require => Service['mysql'],
-  }
 
   case $ensure {
     'present': {
