@@ -42,6 +42,7 @@ define percona::database (
       if $sql_dump_file and file_exists($sql_dump_file) {
         exec { "MySQL import $database db":
           command => "mysql --defaults-file=${defaults_file} ${database} --port=${port} < ${sql_dump_file}",
+          unless  => "mysql --defaults-file=${defaults_file} --port=${port} --execute=\"SHOW DATABASES;\" | grep -x '${database}'",
           require => Exec["MySQL create $database db"],
         }
       }
