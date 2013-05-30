@@ -14,6 +14,6 @@
 # with the "--help" option.
 <% 
 require File.join(File.dirname(__FILE__), 'template')
-PerconaTemplate.new(configurations)
+PerconaTemplate.new(@configurations)
 -%>
 <%= PerconaTemplate.dump %>
