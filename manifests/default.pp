@@ -61,7 +61,6 @@ class percona::default {
       "read_buffer_size" => "1M",
       "read_rnd_buffer_size" => "4M",
       "myisam_sort_buffer_size" => "64M",
-      "query_cache_size" => "16M",
       "thread_cache_size" => "8",
       "thread_concurrency" => "8",
       "innodb_buffer_pool_size" => "256M",
