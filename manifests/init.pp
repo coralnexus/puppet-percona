@@ -124,8 +124,7 @@ class percona (
     }
   }
 
-  package { 'percona_common':
-    name    => $common_packages,
+  package { $common_packages:
     ensure  => $common_ensure,
     require => Package['percona_client'],
   }
