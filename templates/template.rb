@@ -22,7 +22,7 @@ class PerconaTemplate
   def self.render(name = '', render_type = true, remove = true)
     output = ''
     if ! name.empty?
-      unless Coral::Util::Data.empty?(@@blocks[name])    
+      unless CORL::Util::Data.empty?(@@blocks[name])    
         if @@blocks[name].is_a?(String)
           if render_type
             output << "[#{name}]\n"
@@ -47,7 +47,7 @@ class PerconaTemplate
     output = ''        
     if input.is_a?(Hash)
       input.each do |keyword, data|
-        if Coral::Util::Data.empty?(data)
+        if CORL::Util::Data.empty?(data)
           output << "#{keyword}\n"
         else
           if data.is_a?(Array)
