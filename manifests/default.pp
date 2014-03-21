@@ -1,7 +1,7 @@
 
 class percona::default {
 
-  $version                          = '5.5'
+  $version                          = '5.6'
   $client_ensure                    = 'present'
   $server_ensure                    = 'present'
   $common_ensure                    = 'present'
