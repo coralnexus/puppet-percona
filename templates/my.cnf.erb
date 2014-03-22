@@ -54,7 +54,6 @@ innodb_data_home_dir           = <%= @innodb_data_home_dir %>
 innodb_log_group_home_dir      = <%= @innodb_log_group_home_dir %>
 innodb_flush_log_at_trx_commit = <%= @innodb_flush_log_at_trx_commit %>
 innodb_autoinc_lock_mode       = <%= @innodb_autoinc_lock_mode %>
-innodb_locks_unsafe_for_binlog = <%= @innodb_locks_unsafe_for_binlog %>
 <%= PerconaTemplate.render('mysqld', false) %>
 
 <%= PerconaTemplate.render %>
