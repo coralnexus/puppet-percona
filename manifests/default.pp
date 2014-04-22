@@ -1,4 +1,3 @@
-
 class percona::default {
 
   $version                          = '5.6'
@@ -9,7 +8,7 @@ class percona::default {
 
   $server_id                        = 1
   $server_ip                        = $::ipaddress
-  $origin_addresses                 = ''
+  $origin_addresses                 = undef
 
   $cluster_name                     = 'test'
   $allow_remote                     = true
