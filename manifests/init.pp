@@ -152,7 +152,6 @@ class percona (
 
   if $server {
     File {
-      owner   => $user_name,
       group   => $group,
       notify  => Service['mysql'],
     }
