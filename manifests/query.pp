@@ -11,7 +11,8 @@ define percona::query (
   $database      = $percona::params::user_database,
   $defaults_file = $percona::params::user_config,
   $exec_user     = undef,
-  $exec_passwd   = undef
+  $exec_passwd   = undef,
+  $hide_query    = false
 
 ) {
 
@@ -60,7 +61,13 @@ define percona::query (
 
   #---
 
-  $message = "MySQL: Query - ${query}"
+  if $hide_query {
+    $query_md5 = md5($query)
+    $message   = "MySQL: Query - ${query_md5}"
+  }
+  else {
+    $message = "MySQL: Query - ${query}"
+  }
 
   if ! defined(Exec[$message]) {
 

@@ -186,6 +186,7 @@ class percona (
       condition     => "SELECT * FROM user WHERE User = '${root_user}' AND Password != PASSWORD('${root_password}')",
       port          => $port,
       database      => 'mysql',
+      hide_query    => true
     }
 
     percona::user { $mysql_user:
