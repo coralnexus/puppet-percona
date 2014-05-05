@@ -64,6 +64,7 @@ class percona (
   $configure_firewall               = $percona::params::configure_firewall,
   $percona_ports                    = $percona::params::percona_ports,
   $port                             = $percona::params::port,
+  $mysqlchk_user                    = $percona::params::mysqlchk_user,
   $mysqlchk_port                    = $percona::params::mysqlchk_port,
   $user_name                        = $percona::params::user_name,
   $group                            = $percona::params::group,
@@ -229,7 +230,7 @@ class percona (
         flags          => 'REUSE',
         socket_type    => 'stream',
         wait           => 'no',
-        user           => 'nobody',
+        user           => $mysqlchk_user,
         log_on_failure => '+= USERID',
         per_source     => 'UNLIMITED'
       }

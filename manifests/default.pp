@@ -15,6 +15,7 @@ class percona::default {
   $configure_firewall               = true
   $percona_ports                    = [ 4444, 4567, 4568 ]
   $port                             = 3306
+  $mysqlchk_user                    = 'root'
   $mysqlchk_port                    = 9200
   $user_name                        = 'mysql'
   $group                            = 'mysql'

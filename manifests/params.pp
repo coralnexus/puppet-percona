@@ -47,6 +47,7 @@ class percona::params inherits percona::default {
   $configure_firewall               = module_param('configure_firewall')
   $percona_ports                    = module_array('percona_ports')
   $port                             = module_param('port')
+  $mysqlchk_user                    = module_param('mysqlchk_user')
   $mysqlchk_port                    = module_param('mysqlchk_port')
   $user_name                        = module_param('user_name')
   $group                            = module_param('group')
