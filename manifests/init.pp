@@ -180,7 +180,7 @@ class percona (
     file { 'percona_data_dir':
       path   => $data_dir,
       ensure => directory,
-      mode   => '0770',
+      mode   => '0700',
     }
 
     file { 'percona_config':
