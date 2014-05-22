@@ -45,6 +45,7 @@ class percona (
   $common_ensure                    = $percona::params::common_ensure,
   $config                           = $percona::params::config,
   $config_template                  = $percona::params::config_template,
+  $config_dir                       = $percona::params::config_dir,
   $conf_dir                         = $percona::params::conf_dir,
   $configurations                   = $percona::params::configurations,
   $log_dir                          = $percona::params::log_dir,
@@ -121,7 +122,7 @@ class percona (
     package { 'percona_server':
       name    => $server_package,
       ensure  => $server_ensure,
-      require => Package['percona_client'],
+      require => [ Package['percona_client'], File['percona_config'] ],
     }
   }
 
@@ -152,29 +153,40 @@ class percona (
   #---
 
   if $server {
+    group { $group:
+      ensure => present,
+      system => true,
+    }
+
     File {
       group   => $group,
+      require => Group['mysql'],
       notify  => Service['mysql'],
     }
 
-    file { 'percona_conf_dir':
-      path   => $conf_dir,
+    file { 'percona_config_dir':
+      path   => $config_dir,
       ensure => directory,
-      mode   => '0700',
-      require => Package['percona_server']
+      mode   => '0770',
+    }
+
+    file { 'percona_conf_dir':
+      path    => $conf_dir,
+      ensure  => directory,
+      mode    => '0770',
+      require => File['percona_config_dir'],
     }
 
     file { 'percona_data_dir':
       path   => $data_dir,
       ensure => directory,
-      mode   => '0700',
-      require => Package['percona_server']
+      mode   => '0770',
     }
 
     file { 'percona_config':
       path    => $config,
       content => template($config_template),
-      require => File['percona_conf_dir'],
+      require => File['percona_config_dir'],
     }
   }
 

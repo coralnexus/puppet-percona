@@ -28,6 +28,7 @@ class percona::params inherits percona::default {
   $config_template                  = module_param('config_template')
   $generic_template                 = module_param('generic_template')
   $user_config                      = module_param('user_config')
+  $config_dir                       = module_param('config_dir')
   $conf_dir                         = module_param('conf_dir')
   $log_dir                          = module_param('log_dir')
   $error_log                        = module_param('error_log')

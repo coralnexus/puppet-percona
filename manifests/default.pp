@@ -102,9 +102,11 @@ class percona::default {
         'percona-toolkit',
       ]
 
-      $config                    = '/etc/mysql/my.cnf'
-      $user_config               = '/etc/mysql/debian.cnf'
-      $conf_dir                  = '/etc/mysql/conf.d'
+      $config_dir                = '/etc/mysql'
+      $config                    = "${config_dir}/my.cnf"
+      $user_config               = "${config_dir}/debian.cnf"
+      $conf_dir                  = "${config_dir}/conf.d"
+
 
       $log_dir                   = '/var/log/percona'
       $error_log                 = "${log_dir}/mysqld.log"
