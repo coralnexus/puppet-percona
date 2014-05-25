@@ -74,6 +74,9 @@ define percona::database (
     percona::user { "${user_name}-${database}-local":
       host => 'localhost',
     }
+    percona::user { "${user_name}-${database}-loopback":
+      host => '127.0.0.1',
+    }
 
     if $allow_remote {
       percona::user { "${user_name}-${database}-remote":
