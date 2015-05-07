@@ -39,7 +39,7 @@ define percona::database (
         unless  => "mysql --defaults-file=${defaults_file} --port=${port} --execute=\"SHOW DATABASES;\" | grep -x '${database}'",
       }
 
-      if $sql_dump_file {
+      if $sql_dump_file and file_exists($sql_dump_file) {
         exec { "MySQL import $database db":
           command => "mysql --defaults-file=${defaults_file} ${database} --port=${port} < ${sql_dump_file}",
           unless  => "mysql --defaults-file=${defaults_file} --port=${port} --execute=\"SHOW TABLES FROM ${database};\" | grep 'Tables'",
